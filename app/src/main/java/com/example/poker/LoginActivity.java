@@ -1,10 +1,13 @@
 package com.example.poker;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -35,6 +38,11 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Starts activity horizontally and fullscreen
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         setContentView(R.layout.activity_login);
 
 
@@ -69,7 +77,8 @@ public class LoginActivity extends AppCompatActivity {
                             //Log.d(TAG, "signInWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             Toast.makeText(LoginActivity.this, "Signed In", Toast.LENGTH_SHORT).show();
-                            //updateUI(user);
+                            loggedIn(user);
+
 
                         } else {
                             // If sign in fails, display a message to the user.
@@ -93,8 +102,14 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser!= null){
             Toast.makeText(this, "Already Logged In", Toast.LENGTH_SHORT).show();
+            loggedIn(currentUser);
         }
         //updateUI(currentUser);
+    }
+
+    public void loggedIn(FirebaseUser currentuser) {
+
+
     }
 
 }
