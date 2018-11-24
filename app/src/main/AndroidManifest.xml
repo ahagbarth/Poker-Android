@@ -25,10 +25,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity"
-            android:screenOrientation="sensorLandscape"/>
-        <activity android:name=".SignupActivity"
-            android:screenOrientation="sensorLandscape"></activity>
+        <activity
+            android:name=".LoginActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".SignupActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity android:name=".MainPageActivity"></activity>
     </application>
 
 </manifest>
