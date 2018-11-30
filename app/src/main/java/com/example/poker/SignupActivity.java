@@ -1,5 +1,6 @@
 package com.example.poker;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -69,6 +70,9 @@ public class SignupActivity extends AppCompatActivity {
                             Toast.makeText(SignupActivity.this, "Account Created!", Toast.LENGTH_SHORT).show();
                             FirebaseUser user = mAuth.getCurrentUser();
                            // updateUI(user);
+
+                            Intent createdAccount = new Intent(SignupActivity.this, UsernameActivity.class);
+                            startActivity(createdAccount);
 
 
                         } else {

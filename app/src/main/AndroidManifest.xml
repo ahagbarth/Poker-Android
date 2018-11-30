@@ -31,7 +31,13 @@
         <activity
             android:name=".SignupActivity"
             android:screenOrientation="sensorLandscape" />
-        <activity android:name=".MainPageActivity"
+        <activity
+            android:name=".MainPageActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".UserProfileActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity android:name=".UsernameActivity"
             android:screenOrientation="sensorLandscape"></activity>
     </application>
 

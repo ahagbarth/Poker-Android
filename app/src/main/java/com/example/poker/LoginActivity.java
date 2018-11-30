@@ -98,17 +98,21 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+        /*
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser!= null){
             Toast.makeText(this, "Already Logged In", Toast.LENGTH_SHORT).show();
             loggedIn(currentUser);
+
         }
         //updateUI(currentUser);
+        */
     }
 
     public void loggedIn(FirebaseUser currentuser) {
-
+        Intent loggedIn = new Intent(LoginActivity.this, MainPageActivity.class);
+        startActivity(loggedIn);
 
     }
 
