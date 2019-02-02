@@ -35,7 +35,7 @@ public class UsernameActivity extends AppCompatActivity {
 
     //Databases
     DatabaseReference databaseUsers;
-    //DatabaseReference databaseStats;
+
 
 
 
@@ -58,7 +58,7 @@ public class UsernameActivity extends AppCompatActivity {
 
         //Database instances
         databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
-       // databaseStats = FirebaseDatabase.getInstance().getReference("UserStats");
+
 
         //Button to save the profile
         buttonSave = findViewById(R.id.buttonSave);
@@ -107,11 +107,9 @@ public class UsernameActivity extends AppCompatActivity {
 
                             //Add user in database
                             String id =  user.getUid();
-                            Users user = new Users(id, displayName);
 
-                            databaseUsers.child(id).setValue(user);
-
-                            //Set starting stats to the user
+                            Stats userStats = new Stats(id, displayName, 0, 0, 0, 0);
+                            databaseUsers.child(id).setValue(userStats);
 
 
 

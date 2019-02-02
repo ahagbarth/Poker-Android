@@ -23,9 +23,11 @@ public class FriendProfileActivity extends AppCompatActivity {
 
     private DatabaseReference mUsersDatabase;
 
+
     private TextView mProfileName;
     private Button mProfileSendReqBtn;
     private Button mProfileDecline;
+    private TextView mUserLevel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,7 @@ public class FriendProfileActivity extends AppCompatActivity {
         mProfileName = findViewById(R.id.userName);
         mProfileSendReqBtn = findViewById(R.id.buttonFriendRequest);
         mProfileDecline = findViewById(R.id.ProfileDeclinebtn);
+        mUserLevel = findViewById(R.id.userLevel);
 
 
 
@@ -50,13 +53,16 @@ public class FriendProfileActivity extends AppCompatActivity {
         //Database Reference
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(id);
 
+
         //Receiving user data
         mUsersDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String userName = dataSnapshot.child("userName").getValue().toString();
+                String userLevel = dataSnapshot.child("userLevel").getValue().toString();
 
                 mProfileName.setText(userName);
+                mUserLevel.setText(userLevel);
             }
 
             @Override
@@ -64,6 +70,8 @@ public class FriendProfileActivity extends AppCompatActivity {
 
             }
         });
+
+
 
 
 

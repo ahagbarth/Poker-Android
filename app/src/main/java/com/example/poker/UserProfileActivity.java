@@ -8,8 +8,15 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class UserProfileActivity extends AppCompatActivity {
+
+    DatabaseReference mUserDatabase;
 
     TextView userName, userLevel;
 
@@ -39,7 +46,28 @@ public class UserProfileActivity extends AppCompatActivity {
 
             //User Level
             userLevel = findViewById(R.id.userLevel);
-            //userLevel.setText(user.getDisplayName().toString());
+
+
+            mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
+
+            mUserDatabase.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String Level = dataSnapshot.child("userLevel").getValue().toString();
+                    userLevel.setText(Level);
+
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+
+
+
         }
 
 
