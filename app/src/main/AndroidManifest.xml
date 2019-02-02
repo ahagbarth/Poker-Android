@@ -37,7 +37,16 @@
         <activity
             android:name=".UserProfileActivity"
             android:screenOrientation="sensorLandscape" />
-        <activity android:name=".UsernameActivity"
+        <activity
+            android:name=".UsernameActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".FriendsActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".AddFriendActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity android:name=".FriendProfileActivity"
             android:screenOrientation="sensorLandscape"></activity>
     </application>
 

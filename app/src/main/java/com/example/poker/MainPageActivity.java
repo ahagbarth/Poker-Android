@@ -47,7 +47,8 @@ public class MainPageActivity extends AppCompatActivity {
         buttonFriends.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent friends = new Intent(MainPageActivity.this, FriendsActivity.class);
+                startActivity(friends);
             }
         });
 
@@ -68,6 +69,8 @@ public class MainPageActivity extends AppCompatActivity {
         });
 
     }
+
+
 
     @Override
     protected void onStart() {
