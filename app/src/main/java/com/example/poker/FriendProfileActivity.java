@@ -30,14 +30,17 @@ public class FriendProfileActivity extends AppCompatActivity {
     private DatabaseReference mFriendRequestDatabase;
     private DatabaseReference mFriendsDatabase;
 
-    private String friendState;
+
 
     String userName;
+
+    String friendState;
 
     private TextView mProfileName;
     private Button mProfileSendReqBtn;
     private Button mProfileDecline;
     private Button mAcceptRequest;
+    private Button mUnfriend;
     private TextView mUserLevel;
 
     @Override
@@ -54,8 +57,11 @@ public class FriendProfileActivity extends AppCompatActivity {
         mProfileSendReqBtn = findViewById(R.id.buttonFriendRequest);
         mProfileDecline = findViewById(R.id.ProfileDeclinebtn);
         mAcceptRequest = findViewById(R.id.buttonAcceptRequest);
+        mUnfriend = findViewById(R.id.buttonUnfriend);
         mUserLevel = findViewById(R.id.userLevel);
 
+
+        //Setting initial friend state
         friendState = "notFriends";
 
         //Receive intent
@@ -85,13 +91,34 @@ public class FriendProfileActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if(dataSnapshot.child("Sender").child(mUser.getUid()).hasChild(id)) {
-                            Toast.makeText(FriendProfileActivity.this, "Request Sent", Toast.LENGTH_SHORT).show();
+                            mProfileSendReqBtn.setVisibility(View.GONE);
+                            mProfileDecline.setVisibility(View.VISIBLE);
+                            //mAcceptRequest.setVisibility(View.VISIBLE);
 
                         }
                         if(dataSnapshot.child("Receiver").child(mUser.getUid()).hasChild(id)) {
-                            Toast.makeText(FriendProfileActivity.this, "Request Received", Toast.LENGTH_SHORT).show();
+                            mProfileSendReqBtn.setVisibility(View.GONE);
+                            mProfileDecline.setVisibility(View.VISIBLE);
+                            mAcceptRequest.setVisibility(View.VISIBLE);
                         }
 
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+                mFriendsDatabase.child(mUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.hasChild(id)){
+                            mProfileDecline.setVisibility(View.GONE);
+                            mAcceptRequest.setVisibility(View.GONE);
+                            mProfileSendReqBtn.setVisibility(View.GONE);
+                            mUnfriend.setVisibility(View.VISIBLE);
+                        }
                     }
 
                     @Override
@@ -137,17 +164,19 @@ public class FriendProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if(friendState == "notFriends") {
+
                     mFriendRequestDatabase.child("Sender").child(mUser.getUid()).child(id).setValue("Sent").addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             mFriendRequestDatabase.child("Receiver").child(id).child(mUser.getUid()).setValue("Received").addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-
-                                    Toast.makeText(FriendProfileActivity.this, "Friend Request Sent", Toast.LENGTH_SHORT).show();
                                     friendState = "requestSent";
+                                    Toast.makeText(FriendProfileActivity.this, "Friend Request Sent", Toast.LENGTH_SHORT).show();
+
                                     mProfileSendReqBtn.setVisibility(View.GONE);
+                                    mProfileDecline.setVisibility(View.VISIBLE);
+                                    //mAcceptRequest.setVisibility(View.VISIBLE);
 
                                 }
                             });
@@ -156,7 +185,7 @@ public class FriendProfileActivity extends AppCompatActivity {
 
                 }
 
-            }
+
         });
 
 
@@ -164,7 +193,7 @@ public class FriendProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-             if(friendState == "requestSent"){
+
                  mFriendRequestDatabase.child("Receiver").child(id).child(mUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                      @Override
                      public void onComplete(@NonNull Task<Void> task) {
@@ -172,19 +201,85 @@ public class FriendProfileActivity extends AppCompatActivity {
                           @Override
                           public void onComplete(@NonNull Task<Void> task) {
                               Toast.makeText(FriendProfileActivity.this, "Request Cancelled", Toast.LENGTH_SHORT).show();
+                              mProfileSendReqBtn.setVisibility(View.VISIBLE);
+                              mProfileDecline.setVisibility(View.GONE);
+                              mAcceptRequest.setVisibility(View.GONE);
+
                           }
                       });
                      }
                  });
              }
 
-            }
+
         });
 
         mAcceptRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+
+                //Adds the users to the Friends database as friends
+                mFriendsDatabase.child(mUser.getUid()).child(id).setValue("").addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                        mFriendsDatabase.child(id).child(mUser.getUid()).setValue("").addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Toast.makeText(FriendProfileActivity.this, "Friend Added", Toast.LENGTH_SHORT).show();
+
+
+                                mFriendRequestDatabase.child("Receiver").child(mUser.getUid()).child(id).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        mFriendRequestDatabase.child("Sender").child(id).child(mUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                mUnfriend.setVisibility(View.VISIBLE);
+                                                mProfileSendReqBtn.setVisibility(View.GONE);
+                                                mProfileDecline.setVisibility(View.GONE);
+                                                mAcceptRequest.setVisibility(View.GONE);
+
+                                            }
+                                        });
+                                    }
+                                });
+
+
+                            }
+                        });
+
+                    }
+                });
+
+
+
+
+            }
+        });
+
+        mUnfriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mFriendsDatabase.child(mUser.getUid()).child(id).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                        mFriendsDatabase.child(id).child(mUser.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+
+                                Toast.makeText(FriendProfileActivity.this, "Friend Removed", Toast.LENGTH_SHORT).show();
+
+                                mUnfriend.setVisibility(View.GONE);
+                                mProfileSendReqBtn.setVisibility(View.VISIBLE);
+
+
+                            }
+                        });
+                    }
+                });
             }
         });
 
