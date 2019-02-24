@@ -21,6 +21,7 @@ public class MainPageActivity extends AppCompatActivity {
 
     TextView userName;
     ImageButton buttonProfile, buttonFriends, buttonSettings, buttonLeaderboard;
+    Button buttonJoinTable, buttonCreateTable, buttonQuickMatch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +66,31 @@ public class MainPageActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+            }
+        });
+
+        buttonJoinTable = findViewById(R.id.buttonJoinTable);
+        buttonJoinTable.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        buttonCreateTable = findViewById(R.id.buttonCreateTable);
+        buttonCreateTable.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        buttonQuickMatch = findViewById(R.id.buttonQuickMatch);
+        buttonQuickMatch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainPageActivity.this, QuickmatchGameActivity.class);
+                startActivity(intent);
             }
         });
 

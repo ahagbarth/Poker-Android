@@ -46,7 +46,10 @@
         <activity
             android:name=".AddFriendActivity"
             android:screenOrientation="sensorLandscape" />
-        <activity android:name=".FriendProfileActivity"
+        <activity
+            android:name=".FriendProfileActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity android:name=".QuickmatchGameActivity"
             android:screenOrientation="sensorLandscape"></activity>
     </application>
 
