@@ -1,5 +1,6 @@
 package com.example.poker;
 
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Window;
@@ -33,6 +34,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
     TextView currentUserName, userName1, userName2, userName3, userName4;
     TextView currentUserMoney, userMoney1, userMoney2, userMoney3, userMoney4;
+    TextView amountMoneyBet;
 
     private DatabaseReference mUsersDatabase;
 
@@ -40,6 +42,10 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
     JSONArray usersList;
     JSONArray waitingList;
+    JSONArray tableInitialCards;
+    JSONArray userHand;
+
+
     String userName, userId;
     int numUsers;
     int userPosition;
@@ -91,8 +97,11 @@ public class QuickmatchGameActivity extends AppCompatActivity {
         mSocket.connect();
         mSocket.on(Socket.EVENT_CONNECT, joinLobby);
         mSocket.on("login", onLogin);
+        mSocket.on("game start", onGameStart);
         mSocket.on("user joined", onUserJoined);
         mSocket.on("user left", onUserLeave);
+        mSocket.on("hand", onHand);
+
 
         //Profile Images of players
         CurrentUserImage = findViewById(R.id.CurrentUserImage);
@@ -122,7 +131,8 @@ public class QuickmatchGameActivity extends AppCompatActivity {
         userName3 = findViewById(R.id.userName3);
         userName4 = findViewById(R.id.userName4);
 
-
+        //Money bet on the table of all users
+        amountMoneyBet = findViewById(R.id.amountMoneyBet);
 
 
 
@@ -168,10 +178,13 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
                     try {
 
+
+
                         numUsers = data.getInt("numUsers");
                         tableState = data.getString("tableState");
                         waitingList = data.getJSONArray("waitingList");
                         usersList = data.getJSONArray("users");
+
 
 
 
@@ -224,6 +237,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
             });
         }
     };
+
 
 
     private Emitter.Listener onUserJoined = new Emitter.Listener() {
@@ -337,5 +351,77 @@ public class QuickmatchGameActivity extends AppCompatActivity {
             });
         }
     };
+
+    private Emitter.Listener onGameStart = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+
+
+
+                    try {
+
+
+
+                        tableInitialCards = data.getJSONArray("firstThreeCardsTable");
+
+
+
+                        String mCardName1 = tableInitialCards.getString(0);
+                        String mCardName2 = tableInitialCards.getString(1);
+                        String mCardName3 = tableInitialCards.getString(2);
+
+                        int mFirstCard = getResources().getIdentifier(mCardName1 , "drawable", getPackageName());
+                        int mSecondCard = getResources().getIdentifier(mCardName2 , "drawable", getPackageName());
+                        int mThirdCard = getResources().getIdentifier(mCardName3 , "drawable", getPackageName());
+
+                        Drawable firstCard = getResources().getDrawable(mFirstCard);
+                        Drawable secondCard = getResources().getDrawable(mSecondCard);
+                        Drawable thirdCard = getResources().getDrawable(mThirdCard);
+
+                        displayCard1.setImageDrawable(firstCard);
+                        displayCard2.setImageDrawable(secondCard);
+                        displayCard3.setImageDrawable(thirdCard);
+
+
+
+
+                    } catch (JSONException e) {
+
+                        return;
+                    }
+
+                }
+            });
+        }
+    };
+
+
+    private Emitter.Listener onHand = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+
+                    try {
+                        userHand = data.getJSONArray("userHand");
+                        Toast.makeText(QuickmatchGameActivity.this, "" + userHand, Toast.LENGTH_SHORT).show();
+
+
+                    } catch (JSONException e) {
+
+                        return;
+                    }
+
+                }
+            });
+        }
+    };
+
 
 }
