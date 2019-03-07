@@ -13,13 +13,20 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainPageActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
 
+    DatabaseReference mUserDatabase;
 
-    TextView userName;
+
+    TextView userName, userBalance;
     ImageButton buttonProfile, buttonFriends, buttonSettings, buttonLeaderboard;
     Button buttonJoinTable, buttonCreateTable, buttonQuickMatch;
 
@@ -104,24 +111,32 @@ public class MainPageActivity extends AppCompatActivity {
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            // Name, email address, and profile photo Url
-            //Set username
+
             String name = user.getDisplayName();
             userName = findViewById(R.id.userName);
             userName.setText(name);
-            //String email = user.getEmail();
 
-            //Set chosen photo
-            //Uri photoUrl = user.getPhotoUrl();
+            userBalance = findViewById(R.id.userBalance);
 
-            // Check if user's email is verified
-            // boolean emailVerified = user.isEmailVerified();
+            mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
 
-            // The user's ID, unique to the Firebase project. Do NOT use this value to
-            // authenticate with your backend server, if you have one. Use
-            // FirebaseUser.getToken() instead.
-            //String uid = user.getUid();
-            //}
+            mUserDatabase.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String Level = dataSnapshot.child("userBalance").getValue().toString();
+                    userBalance.setText(Level);
+
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+
+
         }
 
     }

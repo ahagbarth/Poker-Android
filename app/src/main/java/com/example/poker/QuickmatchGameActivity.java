@@ -29,6 +29,7 @@ import org.json.JSONObject;
 
 import java.math.RoundingMode;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 public class QuickmatchGameActivity extends AppCompatActivity {
 
@@ -37,7 +38,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
     ImageView currentUserCard1, currentUserCard2;
 
     TextView currentUserName, userName1, userName2, userName3, userName4;
-    TextView currentUserMoney, userMoney1, userMoney2, userMoney3, userMoney4;
+    TextView currentUserBalance, userBalance1, userBalance2, userBalance3, userBalance4;
     TextView amountMoneyBet;
 
     private DatabaseReference mUsersDatabase;
@@ -132,11 +133,11 @@ public class QuickmatchGameActivity extends AppCompatActivity {
         currentUserCard2 = findViewById(R.id.currentUserCard2);
 
         //Money of the players
-        userMoney1 = findViewById(R.id.userMoney1);
-        userMoney2 = findViewById(R.id.userMoney2);
-        userMoney3 = findViewById(R.id.userMoney3);
-        userMoney4 = findViewById(R.id.userMoney4);
-        currentUserMoney = findViewById(R.id.currentUserMoney);
+        userBalance1 = findViewById(R.id.userMoney1);
+        userBalance2 = findViewById(R.id.userMoney2);
+        userBalance3 = findViewById(R.id.userMoney3);
+        userBalance4 = findViewById(R.id.userMoney4);
+        currentUserBalance = findViewById(R.id.currentUserMoney);
 
         //User names
         currentUserName = findViewById(R.id.currentUserName);
@@ -152,6 +153,9 @@ public class QuickmatchGameActivity extends AppCompatActivity {
         buttonBet = findViewById(R.id.buttonBet);
         buttonCall = findViewById(R.id.buttonCall);
         buttonFold = findViewById(R.id.buttonFold);
+
+        //Display turn signal
+
 
         buttonBet.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -212,7 +216,123 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                         usersList = data.getJSONArray("users");
 
 
+                        mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
 
+                        mUsersDatabase.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                String currentUserMoney = dataSnapshot.child(userId).child("userBalance").getValue().toString();
+
+                                int userNumber = usersList.length();
+
+                                currentUserBalance.setText(currentUserMoney);
+
+                                switch(numUsers) {
+
+                                    case 1:
+
+                                        break;
+                                    case 2:
+                                        try {
+                                            String name1 = dataSnapshot.child(usersList.getString(0)).child("userName").getValue().toString();
+                                            userName1.setText(name1);
+                                            String userMoney1 = dataSnapshot.child(usersList.getString(0)).child("userBalance").getValue().toString();
+                                            userBalance1.setText(userMoney1);
+
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                        break;
+                                    case 3:
+                                        try {
+                                            String name1 = dataSnapshot.child(usersList.getString(0)).child("userName").getValue().toString();
+                                            userName1.setText(name1);
+                                            String userMoney1 = dataSnapshot.child(usersList.getString(0)).child("userBalance").getValue().toString();
+                                            userBalance1.setText(userMoney1);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                        try {
+                                            String name2 = dataSnapshot.child(usersList.getString(1)).child("userName").getValue().toString();
+                                            userName2.setText(name2);
+                                            String userMoney2 = dataSnapshot.child(usersList.getString(1)).child("userBalance").getValue().toString();
+                                            userBalance2.setText(userMoney2);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                        break;
+                                    case 4:
+                                        try {
+                                            String name1 = dataSnapshot.child(usersList.getString(0)).child("userName").getValue().toString();
+                                            userName1.setText(name1);
+                                            String userMoney1 = dataSnapshot.child(usersList.getString(0)).child("userBalance").getValue().toString();
+                                            userBalance1.setText(userMoney1);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                        try {
+                                            String name2 = dataSnapshot.child(usersList.getString(1)).child("userName").getValue().toString();
+                                            userName2.setText(name2);
+                                            String userMoney2 = dataSnapshot.child(usersList.getString(1)).child("userBalance").getValue().toString();
+                                            userBalance2.setText(userMoney2);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                        try {
+                                            String name3 = dataSnapshot.child(usersList.getString(2)).child("userName").getValue().toString();
+                                            userName3.setText(name3);
+                                            String userMoney3 = dataSnapshot.child(usersList.getString(2)).child("userBalance").getValue().toString();
+                                            userBalance3.setText(userMoney3);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                        break;
+                                    case 5:
+                                        try {
+                                            String name1 = dataSnapshot.child(usersList.getString(0)).child("userName").getValue().toString();
+                                            userName1.setText(name1);
+                                            String userMoney1 = dataSnapshot.child(usersList.getString(0)).child("userBalance").getValue().toString();
+                                            userBalance1.setText(userMoney1);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                        try {
+                                            String name2 = dataSnapshot.child(usersList.getString(1)).child("userName").getValue().toString();
+                                            userName2.setText(name2);
+                                            String userMoney2 = dataSnapshot.child(usersList.getString(1)).child("userBalance").getValue().toString();
+                                            userBalance2.setText(userMoney2);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                        try {
+                                            String name3 = dataSnapshot.child(usersList.getString(2)).child("userName").getValue().toString();
+                                            userName3.setText(name3);
+                                            String userMoney3 = dataSnapshot.child(usersList.getString(2)).child("userBalance").getValue().toString();
+                                            userBalance3.setText(userMoney3);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                        try {
+                                            String name4 = dataSnapshot.child(usersList.getString(3)).child("userName").getValue().toString();
+                                            userName4.setText(name4);
+                                            String userMoney4 = dataSnapshot.child(usersList.getString(3)).child("userBalance").getValue().toString();
+                                            userBalance4.setText(userMoney4);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                        break;
+
+                                }
+
+
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
 
 
 
@@ -227,31 +347,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
                         }
                         //adds already online people to the chairs
-                        switch(numUsers) {
 
-                            case 1:
-
-                                break;
-                            case 2:
-                                userName1.setText(usersList.getString(0));
-                                break;
-                            case 3:
-                                userName1.setText(usersList.getString(0));
-                                userName2.setText(usersList.getString(1));
-                                break;
-                            case 4:
-                                userName1.setText(usersList.getString(0));
-                                userName2.setText(usersList.getString(1));
-                                userName3.setText(usersList.getString(2));
-                                break;
-                            case 5:
-                                userName1.setText(usersList.getString(0));
-                                userName2.setText(usersList.getString(1));
-                                userName3.setText(usersList.getString(2));
-                                userName4.setText(usersList.getString(3));
-                                break;
-
-                        }
 
 
                     } catch (JSONException e) {
@@ -356,7 +452,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 username = dataSnapshot.child(userId).child("userName").getValue().toString();
-                                userMoney1.setText(username);
+
                             }
 
                             @Override
