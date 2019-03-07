@@ -108,7 +108,7 @@ public class UsernameActivity extends AppCompatActivity {
                             //Add user in database
                             String id =  user.getUid();
 
-                            Stats userStats = new Stats(id, displayName, 0, 0, 0, 0);
+                            Stats userStats = new Stats(id, displayName, 0, 0, 0, 0, 100000);
                             databaseUsers.child(id).setValue(userStats);
 
 

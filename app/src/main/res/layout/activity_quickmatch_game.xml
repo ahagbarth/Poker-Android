@@ -312,9 +312,9 @@
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/CurrentUserImage"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/CurrentUserImage" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/userName4"
@@ -401,5 +401,27 @@
         android:text="Fold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/buttonCall" />
+
+    <ImageView
+        android:id="@+id/currentUserCard1"
+        android:layout_width="38dp"
+        android:layout_height="52dp"
+        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline4"
+        app:srcCompat="@drawable/cardback" />
+
+    <ImageView
+        android:id="@+id/currentUserCard2"
+        android:layout_width="38dp"
+        android:layout_height="52dp"
+        android:layout_marginBottom="24dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline4"
+        app:srcCompat="@drawable/cardback" />
 
 </android.support.constraint.ConstraintLayout>

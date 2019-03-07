@@ -3,8 +3,10 @@ package com.example.poker;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,12 +27,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.RoundingMode;
 import java.net.URISyntaxException;
 
 public class QuickmatchGameActivity extends AppCompatActivity {
 
     ImageView CurrentUserImage, UserImage1, UserImage2, UserImage3, UserImage4;
     ImageView displayCard1, displayCard2, displayCard3, displayCard4, displayCard5;
+    ImageView currentUserCard1, currentUserCard2;
 
     TextView currentUserName, userName1, userName2, userName3, userName4;
     TextView currentUserMoney, userMoney1, userMoney2, userMoney3, userMoney4;
@@ -58,6 +62,8 @@ public class QuickmatchGameActivity extends AppCompatActivity {
     }
 
     String tableState;
+
+    Button buttonBet, buttonCall, buttonFold;
 
 
 
@@ -101,6 +107,10 @@ public class QuickmatchGameActivity extends AppCompatActivity {
         mSocket.on("user joined", onUserJoined);
         mSocket.on("user left", onUserLeave);
         mSocket.on("hand", onHand);
+        mSocket.on("roundOne", onRoundOne);
+        mSocket.on("roundTwo", onRoundTwo);
+        mSocket.on("roundThree", onRoundThree);
+        mSocket.on("finalRound", onFinalRound);
 
 
         //Profile Images of players
@@ -116,6 +126,10 @@ public class QuickmatchGameActivity extends AppCompatActivity {
         displayCard3 = findViewById(R.id.displayCard3);
         displayCard4 = findViewById(R.id.displayCard4);
         displayCard5 = findViewById(R.id.displayCard5);
+
+        //User hand cards
+        currentUserCard1 = findViewById(R.id.currentUserCard1);
+        currentUserCard2 = findViewById(R.id.currentUserCard2);
 
         //Money of the players
         userMoney1 = findViewById(R.id.userMoney1);
@@ -133,6 +147,18 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
         //Money bet on the table of all users
         amountMoneyBet = findViewById(R.id.amountMoneyBet);
+
+        //Buttons for betting/calling/fold
+        buttonBet = findViewById(R.id.buttonBet);
+        buttonCall = findViewById(R.id.buttonCall);
+        buttonFold = findViewById(R.id.buttonFold);
+
+        buttonBet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSocket.emit("change game state", "");
+            }
+        });
 
 
 
@@ -359,14 +385,38 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     JSONObject data = (JSONObject) args[0];
+                    mSocket.emit("ReceiveCard", "");
 
+                    displayCard1.setImageResource(R.drawable.cardback);
+                    displayCard2.setImageResource(R.drawable.cardback);
+                    displayCard3.setImageResource(R.drawable.cardback);
+                    displayCard4.setImageResource(R.drawable.cardback);
+                    displayCard5.setImageResource(R.drawable.cardback);
+
+
+                }
+            });
+        }
+    };
+
+
+    private Emitter.Listener onRoundOne = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+                    int round;
 
 
                     try {
 
+                         round = data.getInt("gameState");
 
 
                         tableInitialCards = data.getJSONArray("firstThreeCardsTable");
+
 
 
 
@@ -400,6 +450,114 @@ public class QuickmatchGameActivity extends AppCompatActivity {
     };
 
 
+    private Emitter.Listener onRoundTwo = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+                    JSONArray roundTwo;
+
+
+                    try {
+
+
+                        roundTwo = data.getJSONArray("secondRoundCard");
+
+
+                        String card4 = roundTwo.getString(0);
+
+                        int mFourthCard = getResources().getIdentifier(card4 , "drawable", getPackageName());
+
+                        Drawable fourthCard = getResources().getDrawable(mFourthCard);
+
+
+                        displayCard4.setImageDrawable(fourthCard);
+
+
+
+
+
+                    } catch (JSONException e) {
+
+                        return;
+                    }
+
+                }
+            });
+        }
+    };
+
+
+    private Emitter.Listener onRoundThree = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+
+                    JSONArray roundThree;
+
+                    try {
+                        roundThree = data.getJSONArray("finalRoundCard");
+
+
+                        String card5 = roundThree.getString(0);
+
+                        int mFifthCard = getResources().getIdentifier(card5 , "drawable", getPackageName());
+
+                        Drawable fifthCard = getResources().getDrawable(mFifthCard);
+
+
+                        displayCard5.setImageDrawable(fifthCard);
+
+
+
+                    } catch (JSONException e) {
+
+                        return;
+                    }
+
+                }
+            });
+        }
+    };
+
+
+    private Emitter.Listener onFinalRound = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+
+                    JSONArray round;
+
+                    try {
+
+                        round = data.getJSONArray("finalRoundCard");
+                        Toast.makeText(QuickmatchGameActivity.this, "" + round.getString(0), Toast.LENGTH_SHORT).show();
+
+
+
+                    } catch (JSONException e) {
+
+                        return;
+                    }
+
+                }
+            });
+        }
+    };
+
+
+
+
+
+
     private Emitter.Listener onHand = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
@@ -410,7 +568,18 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
                     try {
                         userHand = data.getJSONArray("userHand");
-                        Toast.makeText(QuickmatchGameActivity.this, "" + userHand, Toast.LENGTH_SHORT).show();
+
+                        String card1 = userHand.getString(0);
+                        String card2 = userHand.getString(1);
+
+                        int mFirstCard = getResources().getIdentifier(card1 , "drawable", getPackageName());
+                        int mSecondCard = getResources().getIdentifier(card2 , "drawable", getPackageName());
+
+                        Drawable firstCard = getResources().getDrawable(mFirstCard);
+                        Drawable secondCard = getResources().getDrawable(mSecondCard);
+
+                        currentUserCard1.setImageDrawable(firstCard);
+                        currentUserCard2.setImageDrawable(secondCard);
 
 
                     } catch (JSONException e) {
