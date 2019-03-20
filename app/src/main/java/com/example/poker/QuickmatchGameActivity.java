@@ -40,6 +40,8 @@ public class QuickmatchGameActivity extends AppCompatActivity {
     TextView currentUserName, userName1, userName2, userName3, userName4;
     TextView currentUserBalance, userBalance1, userBalance2, userBalance3, userBalance4;
     TextView amountMoneyBet;
+    TextView currentUserBet, userMoneyBet1, userMoneyBet2, userMoneyBet3, userMoneyBet4;
+    TextView turnDisplay;
 
     private DatabaseReference mUsersDatabase;
 
@@ -63,6 +65,8 @@ public class QuickmatchGameActivity extends AppCompatActivity {
     }
 
     String tableState;
+
+    Boolean myTurn = false;
 
     Button buttonBet, buttonCall, buttonFold;
 
@@ -112,6 +116,9 @@ public class QuickmatchGameActivity extends AppCompatActivity {
         mSocket.on("roundTwo", onRoundTwo);
         mSocket.on("roundThree", onRoundThree);
         mSocket.on("finalRound", onFinalRound);
+        mSocket.on("passTurn", onTurnPass);
+        mSocket.on("betMoney", onMoneyBet);
+
 
 
         //Profile Images of players
@@ -149,18 +156,69 @@ public class QuickmatchGameActivity extends AppCompatActivity {
         //Money bet on the table of all users
         amountMoneyBet = findViewById(R.id.amountMoneyBet);
 
+        //Money users bet between rounds
+        currentUserBet = findViewById(R.id.currentUserBet);
+        userMoneyBet1 = findViewById(R.id.userMoneyBet1);
+        userMoneyBet2 = findViewById(R.id.userMoneyBet2);
+        userMoneyBet3 = findViewById(R.id.userMoneyBet3);
+        userMoneyBet4 = findViewById(R.id.userMoneyBet4);
+
+
+
+
         //Buttons for betting/calling/fold
         buttonBet = findViewById(R.id.buttonBet);
         buttonCall = findViewById(R.id.buttonCall);
         buttonFold = findViewById(R.id.buttonFold);
 
         //Display turn signal
+        turnDisplay = findViewById(R.id.turnDisplay);
+        turnDisplay.setVisibility(View.GONE);
+
+
 
 
         buttonBet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if(myTurn) {
+                    //mSocket.emit("change game state", "");
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("username", userId);
+                        jsonObject.put("betValue", 10);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    mSocket.emit("betAmount", jsonObject);
+                    mSocket.emit("pass_turn", "");
+
+                    currentUserBet.setText("10");
+
+                } else {
+                    Toast.makeText(QuickmatchGameActivity.this, "Wait for your turn", Toast.LENGTH_SHORT).show();
+                }
+
+
+
+
+            }
+        });
+
+        buttonCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSocket.emit("pass_turn", "");
+            }
+        });
+
+        buttonFold.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 mSocket.emit("change game state", "");
+
             }
         });
 
@@ -214,7 +272,9 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                         tableState = data.getString("tableState");
                         waitingList = data.getJSONArray("waitingList");
                         usersList = data.getJSONArray("users");
+                        userPosition = data.getInt("userPosition");
 
+                        Toast.makeText(QuickmatchGameActivity.this, "" + userPosition, Toast.LENGTH_SHORT).show();
 
                         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
 
@@ -504,18 +564,20 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                 public void run() {
                     JSONObject data = (JSONObject) args[0];
                     int round;
+                   // int tableBet;
 
 
                     try {
 
                          round = data.getInt("gameState");
+                        // tableBet = data.getInt("tableBet");
 
 
                         tableInitialCards = data.getJSONArray("firstThreeCardsTable");
+                        //amountMoneyBet.setText(tableBet);
 
 
-
-
+                        Toast.makeText(QuickmatchGameActivity.this, "" + tableInitialCards, Toast.LENGTH_SHORT).show();
                         String mCardName1 = tableInitialCards.getString(0);
                         String mCardName2 = tableInitialCards.getString(1);
                         String mCardName3 = tableInitialCards.getString(2);
@@ -555,14 +617,15 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                     JSONObject data = (JSONObject) args[0];
                     JSONArray roundTwo;
 
-
+                    //int tableBet;
                     try {
 
 
                         roundTwo = data.getJSONArray("secondRoundCard");
-
+                        //tableBet = data.getInt("tableBet");
 
                         String card4 = roundTwo.getString(0);
+                        //amountMoneyBet.setText(tableBet);
 
                         int mFourthCard = getResources().getIdentifier(card4 , "drawable", getPackageName());
 
@@ -595,10 +658,13 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                     JSONObject data = (JSONObject) args[0];
 
                     JSONArray roundThree;
+                    //int tableBet;
 
                     try {
                         roundThree = data.getJSONArray("finalRoundCard");
+                       // tableBet = data.getInt("tableBet");
 
+                        //amountMoneyBet.setText(tableBet);
 
                         String card5 = roundThree.getString(0);
 
@@ -631,12 +697,14 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                     JSONObject data = (JSONObject) args[0];
 
                     JSONArray round;
+                    //int tableBet;
 
                     try {
-
+                        //tableBet = data.getInt("tableBet");
                         round = data.getJSONArray("finalRoundCard");
                         Toast.makeText(QuickmatchGameActivity.this, "" + round.getString(0), Toast.LENGTH_SHORT).show();
 
+                       // amountMoneyBet.setText(tableBet);
 
 
                     } catch (JSONException e) {
@@ -687,6 +755,95 @@ public class QuickmatchGameActivity extends AppCompatActivity {
             });
         }
     };
+
+    private Emitter.Listener onTurnPass = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+                    int round;
+
+
+                    try {
+
+                        round = data.getInt("turnState");
+                        Toast.makeText(QuickmatchGameActivity.this, "" + round, Toast.LENGTH_SHORT).show();
+
+
+                        if(round ==userPosition) {
+                            turnDisplay.setVisibility(View.VISIBLE);
+                            myTurn = true;
+                        } else {
+                            turnDisplay.setVisibility(View.GONE);
+                            myTurn = false;
+                        }
+
+
+                    } catch (JSONException e) {
+
+                        return;
+                    }
+
+                }
+            });
+        }
+    };
+
+
+    private Emitter.Listener onMoneyBet = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+                    final int currentBet;
+                    final String userBetter;
+
+                    try {
+
+                        currentBet = data.getInt("currentBet");
+                        userBetter = data.getString("better");
+                        //Toast.makeText(QuickmatchGameActivity.this, "" + currentBet + "   " + userBetter, Toast.LENGTH_SHORT).show();
+
+
+                        mUsersDatabase.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                username = dataSnapshot.child(userBetter).child("userName").getValue().toString();
+
+
+
+
+
+
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+
+
+
+
+                    } catch (JSONException e) {
+
+                        return;
+                    }
+
+                }
+            });
+        }
+    };
+
+
+
+
 
 
 }
