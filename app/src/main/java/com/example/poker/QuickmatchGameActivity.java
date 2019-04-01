@@ -1,5 +1,6 @@
 package com.example.poker;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,10 +31,12 @@ import org.json.JSONObject;
 import java.math.RoundingMode;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class QuickmatchGameActivity extends AppCompatActivity {
 
-    ImageView CurrentUserImage, UserImage1, UserImage2, UserImage3, UserImage4;
+    ImageView CurrentUserImage, userImage1, userImage2, userImage3, userImage4;
     ImageView displayCard1, displayCard2, displayCard3, displayCard4, displayCard5;
     ImageView currentUserCard1, currentUserCard2;
 
@@ -42,6 +45,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
     TextView amountMoneyBet;
     TextView currentUserBet, userMoneyBet1, userMoneyBet2, userMoneyBet3, userMoneyBet4;
     TextView turnDisplay;
+    TextView dollarSign1, dollarSign2, dollarSign3, dollarSign4, dollarSign5, dollarSign6, dollarSign7, dollarSign8;
 
     private DatabaseReference mUsersDatabase;
 
@@ -56,6 +60,8 @@ public class QuickmatchGameActivity extends AppCompatActivity {
     String userName, userId;
     int numUsers;
     int userPosition;
+    String currentUserMoney;
+    int currentMoney;
 
     //Whether user is playing, spectating, or offline
     enum UserStatus {
@@ -70,7 +76,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
     Button buttonBet, buttonCall, buttonFold;
 
-
+    int currentMaxBet = 0;
 
 
 
@@ -107,6 +113,8 @@ public class QuickmatchGameActivity extends AppCompatActivity {
         //mSocket.on(Socket.EVENT_CONNECT,onConnect);
         mSocket.connect();
         mSocket.on(Socket.EVENT_CONNECT, joinLobby);
+        mSocket.on(Socket.EVENT_DISCONNECT, disconnectLobby);
+
         mSocket.on("login", onLogin);
         mSocket.on("game start", onGameStart);
         mSocket.on("user joined", onUserJoined);
@@ -118,15 +126,25 @@ public class QuickmatchGameActivity extends AppCompatActivity {
         mSocket.on("finalRound", onFinalRound);
         mSocket.on("passTurn", onTurnPass);
         mSocket.on("betMoney", onMoneyBet);
+        mSocket.on("HandCompare", onResults);
 
+        //These are the dollar signs
+        dollarSign1 = findViewById(R.id.dollarSign1);
+        dollarSign2 = findViewById(R.id.dollarSign2);
+        dollarSign3 = findViewById(R.id.dollarSign3);
+        dollarSign4 = findViewById(R.id.dollarSign4);
+        dollarSign5 = findViewById(R.id.dollarSign5);
+        dollarSign6 = findViewById(R.id.dollarSign6);
+        dollarSign7 = findViewById(R.id.dollarSign7);
+        dollarSign8 = findViewById(R.id.dollarSign8);
 
 
         //Profile Images of players
         CurrentUserImage = findViewById(R.id.CurrentUserImage);
-        UserImage1 = findViewById(R.id.UserImage1);
-        UserImage2 = findViewById(R.id.UserImage2 );
-        UserImage3 = findViewById(R.id.UserImage3);
-        UserImage4 = findViewById(R.id.UserImage4);
+        userImage1 = findViewById(R.id.UserImage1);
+        userImage2 = findViewById(R.id.UserImage2 );
+        userImage3 = findViewById(R.id.UserImage3);
+        userImage4 = findViewById(R.id.UserImage4);
 
         //Cards Displayed on Table
         displayCard1 = findViewById(R.id.displayCard1);
@@ -163,7 +181,35 @@ public class QuickmatchGameActivity extends AppCompatActivity {
         userMoneyBet3 = findViewById(R.id.userMoneyBet3);
         userMoneyBet4 = findViewById(R.id.userMoneyBet4);
 
+        //Setting other users profile info to invisible until they join
+        userName1.setVisibility(View.GONE);
+        userName2.setVisibility(View.GONE);
+        userName3.setVisibility(View.GONE);
+        userName4.setVisibility(View.GONE);
 
+        userBalance1.setVisibility(View.GONE);
+        userBalance2.setVisibility(View.GONE);
+        userBalance3.setVisibility(View.GONE);
+        userBalance4.setVisibility(View.GONE);
+
+        userImage1.setVisibility(View.GONE);
+        userImage2.setVisibility(View.GONE);
+        userImage3.setVisibility(View.GONE);
+        userImage4.setVisibility(View.GONE);
+
+        userMoneyBet1.setVisibility(View.GONE);
+        userMoneyBet2.setVisibility(View.GONE);
+        userMoneyBet3.setVisibility(View.GONE);
+        userMoneyBet4.setVisibility(View.GONE);
+
+        dollarSign1.setVisibility(View.GONE);
+        dollarSign2.setVisibility(View.GONE);
+        dollarSign3.setVisibility(View.GONE);
+        dollarSign4.setVisibility(View.GONE);
+        dollarSign5.setVisibility(View.GONE);
+        dollarSign6.setVisibility(View.GONE);
+        dollarSign7.setVisibility(View.GONE);
+        dollarSign8.setVisibility(View.GONE);
 
 
         //Buttons for betting/calling/fold
@@ -176,13 +222,13 @@ public class QuickmatchGameActivity extends AppCompatActivity {
         turnDisplay.setVisibility(View.GONE);
 
 
-
-
         buttonBet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 if(myTurn) {
+
+
                     //mSocket.emit("change game state", "");
                     JSONObject jsonObject = new JSONObject();
                     try {
@@ -197,9 +243,50 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
                     currentUserBet.setText("10");
 
+
+                    mUsersDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            currentUserMoney = dataSnapshot.child(userId).child("userBalance").getValue().toString();
+                            String currentUserBetValue = dataSnapshot.child(userId).child("userBet").getValue().toString();
+                            currentMoney = Integer.parseInt(currentUserMoney);
+                            int finalmoney = currentMoney - 10;
+
+
+
+                            DatabaseReference refUser = mUsersDatabase.child(userId);
+                            Map<String, Object> updateMoney = new HashMap<>();
+                            updateMoney.put("userBalance", finalmoney);
+
+                                updateMoney.put("userBet", 10);
+
+
+
+
+
+                            refUser.updateChildren(updateMoney);
+
+
+
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+
+
+
+
+
                 } else {
                     Toast.makeText(QuickmatchGameActivity.this, "Wait for your turn", Toast.LENGTH_SHORT).show();
                 }
+
+
 
 
 
@@ -230,6 +317,33 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        mSocket.disconnect();
+
+
+        mSocket.off("user joined", onUserJoined);
+        mSocket.off(Socket.EVENT_CONNECT, joinLobby);
+        mSocket.off("login", onLogin);
+        mSocket.off("game start", onGameStart);
+        mSocket.on("user joined", onUserJoined);
+        mSocket.on("user left", onUserLeave);
+        mSocket.on("hand", onHand);
+        mSocket.on("roundOne", onRoundOne);
+        mSocket.on("roundTwo", onRoundTwo);
+        mSocket.on("roundThree", onRoundThree);
+        mSocket.on("finalRound", onFinalRound);
+        mSocket.on("passTurn", onTurnPass);
+        mSocket.on("betMoney", onMoneyBet);
+
+        mSocket.off(Socket.EVENT_DISCONNECT, disconnectLobby);
+
+
+
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
 
@@ -237,6 +351,23 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
 
         mSocket.off("user joined", onUserJoined);
+        mSocket.off(Socket.EVENT_CONNECT, joinLobby);
+        mSocket.off("login", onLogin);
+        mSocket.off("game start", onGameStart);
+        mSocket.on("user joined", onUserJoined);
+        mSocket.on("user left", onUserLeave);
+        mSocket.on("hand", onHand);
+        mSocket.on("roundOne", onRoundOne);
+        mSocket.on("roundTwo", onRoundTwo);
+        mSocket.on("roundThree", onRoundThree);
+        mSocket.on("finalRound", onFinalRound);
+        mSocket.on("passTurn", onTurnPass);
+        mSocket.on("betMoney", onMoneyBet);
+
+        mSocket.off(Socket.EVENT_DISCONNECT, disconnectLobby);
+
+
+
 
     }
 
@@ -248,12 +379,33 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                 @Override
                 public void run() {
 
+                    //Room Name
+                    Intent intent = getIntent();
+                    String roomName = intent.getStringExtra("RoomName");
+                    Toast.makeText(QuickmatchGameActivity.this, roomName, Toast.LENGTH_SHORT).show();
+
                     mSocket.emit("add user", userId);
+                    mSocket.emit("room", roomName);
 
                 }
             });
         }
     };
+
+    private Emitter.Listener disconnectLobby = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+
+
+                }
+            });
+        }
+    };
+
 
     private Emitter.Listener onLogin = new Emitter.Listener() {
         @Override
@@ -274,7 +426,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                         usersList = data.getJSONArray("users");
                         userPosition = data.getInt("userPosition");
 
-                        Toast.makeText(QuickmatchGameActivity.this, "" + userPosition, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(QuickmatchGameActivity.this, "" + userPosition, Toast.LENGTH_SHORT).show();
 
                         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
 
@@ -282,9 +434,14 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 String currentUserMoney = dataSnapshot.child(userId).child("userBalance").getValue().toString();
+                                String userBet = dataSnapshot.child(userId).child("userBet").getValue().toString();
+
+                                int betUser = Integer.parseInt(userBet);
+
+                                //Toast.makeText(QuickmatchGameActivity.this, "" + currentMaxBet, Toast.LENGTH_SHORT).show();
 
                                 int userNumber = usersList.length();
-
+                                //Toast.makeText(QuickmatchGameActivity.this, "userNumber: " + userNumber + " / numUsers:   " + numUsers + "  / userList: " + usersList, Toast.LENGTH_SHORT).show();
                                 currentUserBalance.setText(currentUserMoney);
 
                                 switch(numUsers) {
@@ -294,10 +451,24 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                                         break;
                                     case 2:
                                         try {
+
+                                            userName1.setVisibility(View.VISIBLE);
+                                            userImage1.setVisibility(View.VISIBLE);
+                                            userBalance1.setVisibility(View.VISIBLE);
+                                            userMoneyBet1.setVisibility(View.VISIBLE);
+                                            dollarSign1.setVisibility(View.VISIBLE);
+                                            dollarSign5.setVisibility(View.VISIBLE);
+                                            userMoneyBet1.setText(userBet);
+
                                             String name1 = dataSnapshot.child(usersList.getString(0)).child("userName").getValue().toString();
                                             userName1.setText(name1);
                                             String userMoney1 = dataSnapshot.child(usersList.getString(0)).child("userBalance").getValue().toString();
                                             userBalance1.setText(userMoney1);
+
+                                            if(betUser >= currentMaxBet) {
+                                                currentMaxBet = betUser;
+                                                mSocket.emit("currentBet" ,currentMaxBet);
+                                            }
 
                                         } catch (JSONException e) {
                                             e.printStackTrace();
@@ -305,78 +476,191 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                                         break;
                                     case 3:
                                         try {
+                                            userName1.setVisibility(View.VISIBLE);
+                                            userImage1.setVisibility(View.VISIBLE);
+                                            userBalance1.setVisibility(View.VISIBLE);
+                                            userMoneyBet1.setVisibility(View.VISIBLE);
+                                            dollarSign1.setVisibility(View.VISIBLE);
+                                            dollarSign5.setVisibility(View.VISIBLE);
                                             String name1 = dataSnapshot.child(usersList.getString(0)).child("userName").getValue().toString();
                                             userName1.setText(name1);
                                             String userMoney1 = dataSnapshot.child(usersList.getString(0)).child("userBalance").getValue().toString();
                                             userBalance1.setText(userMoney1);
+                                            userMoneyBet1.setText(userBet);
+                                            if(betUser > currentMaxBet) {
+                                                currentMaxBet = betUser;
+                                                mSocket.emit("currentBet" ,currentMaxBet);
+                                            }
+
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
                                         try {
+                                            userName2.setVisibility(View.VISIBLE);
+                                            userImage2.setVisibility(View.VISIBLE);
+                                            userBalance2.setVisibility(View.VISIBLE);
+                                            userMoneyBet2.setVisibility(View.VISIBLE);
+                                            dollarSign2.setVisibility(View.VISIBLE);
+                                            dollarSign6.setVisibility(View.VISIBLE);
                                             String name2 = dataSnapshot.child(usersList.getString(1)).child("userName").getValue().toString();
                                             userName2.setText(name2);
                                             String userMoney2 = dataSnapshot.child(usersList.getString(1)).child("userBalance").getValue().toString();
                                             userBalance2.setText(userMoney2);
+                                            userMoneyBet2.setText(userBet);
+
+                                            if(betUser > currentMaxBet) {
+                                                currentMaxBet = betUser;
+                                                mSocket.emit("currentBet" ,currentMaxBet);
+                                            }
+
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
                                         break;
                                     case 4:
                                         try {
+                                            userName1.setVisibility(View.VISIBLE);
+                                            userImage1.setVisibility(View.VISIBLE);
+                                            userBalance1.setVisibility(View.VISIBLE);
+                                            userMoneyBet1.setVisibility(View.VISIBLE);
+                                            dollarSign1.setVisibility(View.VISIBLE);
+                                            dollarSign5.setVisibility(View.VISIBLE);
+                                            userMoneyBet1.setText(userBet);
                                             String name1 = dataSnapshot.child(usersList.getString(0)).child("userName").getValue().toString();
                                             userName1.setText(name1);
                                             String userMoney1 = dataSnapshot.child(usersList.getString(0)).child("userBalance").getValue().toString();
                                             userBalance1.setText(userMoney1);
+
+                                            if(betUser > currentMaxBet) {
+                                                currentMaxBet = betUser;
+                                                mSocket.emit("currentBet" ,currentMaxBet);
+                                            }
+
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
                                         try {
+                                            userName2.setVisibility(View.VISIBLE);
+                                            userImage2.setVisibility(View.VISIBLE);
+                                            userBalance2.setVisibility(View.VISIBLE);
+                                            userMoneyBet2.setVisibility(View.VISIBLE);
+                                            dollarSign2.setVisibility(View.VISIBLE);
+                                            dollarSign6.setVisibility(View.VISIBLE);
+
                                             String name2 = dataSnapshot.child(usersList.getString(1)).child("userName").getValue().toString();
                                             userName2.setText(name2);
                                             String userMoney2 = dataSnapshot.child(usersList.getString(1)).child("userBalance").getValue().toString();
                                             userBalance2.setText(userMoney2);
+                                            userMoneyBet2.setText(userBet);
+                                            if(betUser > currentMaxBet) {
+                                                currentMaxBet = betUser;
+                                                mSocket.emit("currentBet" ,currentMaxBet);
+                                            }
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
                                         try {
+                                            userName3.setVisibility(View.VISIBLE);
+                                            userImage3.setVisibility(View.VISIBLE);
+                                            userBalance3.setVisibility(View.VISIBLE);
+                                            userMoneyBet3.setVisibility(View.VISIBLE);
+                                            dollarSign3.setVisibility(View.VISIBLE);
+                                            dollarSign7.setVisibility(View.VISIBLE);
+
                                             String name3 = dataSnapshot.child(usersList.getString(2)).child("userName").getValue().toString();
                                             userName3.setText(name3);
                                             String userMoney3 = dataSnapshot.child(usersList.getString(2)).child("userBalance").getValue().toString();
                                             userBalance3.setText(userMoney3);
+                                            userMoneyBet3.setText(userBet);
+                                            if(betUser > currentMaxBet) {
+                                                currentMaxBet = betUser;
+                                                mSocket.emit("currentBet" ,currentMaxBet);
+                                            }
+
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
                                         break;
                                     case 5:
                                         try {
+                                            userName1.setVisibility(View.VISIBLE);
+                                            userImage1.setVisibility(View.VISIBLE);
+                                            userBalance1.setVisibility(View.VISIBLE);
+                                            userMoneyBet1.setVisibility(View.VISIBLE);
+                                            dollarSign1.setVisibility(View.VISIBLE);
+                                            dollarSign5.setVisibility(View.VISIBLE);
                                             String name1 = dataSnapshot.child(usersList.getString(0)).child("userName").getValue().toString();
                                             userName1.setText(name1);
                                             String userMoney1 = dataSnapshot.child(usersList.getString(0)).child("userBalance").getValue().toString();
                                             userBalance1.setText(userMoney1);
+                                            userMoneyBet1.setText(userBet);
+                                            if(betUser > currentMaxBet) {
+                                                currentMaxBet = betUser;
+                                                mSocket.emit("currentBet" ,currentMaxBet);
+                                            }
+
+
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
                                         try {
+                                            userName2.setVisibility(View.VISIBLE);
+                                            userImage2.setVisibility(View.VISIBLE);
+                                            userBalance2.setVisibility(View.VISIBLE);
+                                            userMoneyBet2.setVisibility(View.VISIBLE);
+                                            dollarSign2.setVisibility(View.VISIBLE);
+                                            dollarSign6.setVisibility(View.VISIBLE);
                                             String name2 = dataSnapshot.child(usersList.getString(1)).child("userName").getValue().toString();
                                             userName2.setText(name2);
                                             String userMoney2 = dataSnapshot.child(usersList.getString(1)).child("userBalance").getValue().toString();
                                             userBalance2.setText(userMoney2);
+                                            userMoneyBet2.setText(userBet);
+                                            if(betUser > currentMaxBet) {
+                                                currentMaxBet = betUser;
+                                                mSocket.emit("currentBet" ,currentMaxBet);
+                                            }
+
+
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
                                         try {
+                                            userName3.setVisibility(View.VISIBLE);
+                                            userImage3.setVisibility(View.VISIBLE);
+                                            userBalance3.setVisibility(View.VISIBLE);
+                                            userMoneyBet3.setVisibility(View.VISIBLE);
+                                            dollarSign3.setVisibility(View.VISIBLE);
+                                            dollarSign7.setVisibility(View.VISIBLE);
                                             String name3 = dataSnapshot.child(usersList.getString(2)).child("userName").getValue().toString();
                                             userName3.setText(name3);
                                             String userMoney3 = dataSnapshot.child(usersList.getString(2)).child("userBalance").getValue().toString();
                                             userBalance3.setText(userMoney3);
+                                            userMoneyBet3.setText(userBet);
+                                            if(betUser > currentMaxBet) {
+                                                currentMaxBet = betUser;
+                                                mSocket.emit("currentBet" ,currentMaxBet);
+                                            }
+
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
                                         try {
+                                            userName4.setVisibility(View.VISIBLE);
+                                            userImage4.setVisibility(View.VISIBLE);
+                                            userBalance4.setVisibility(View.VISIBLE);
+                                            userMoneyBet4.setVisibility(View.VISIBLE);
+                                            dollarSign4.setVisibility(View.VISIBLE);
+                                            dollarSign8.setVisibility(View.VISIBLE);
                                             String name4 = dataSnapshot.child(usersList.getString(3)).child("userName").getValue().toString();
                                             userName4.setText(name4);
                                             String userMoney4 = dataSnapshot.child(usersList.getString(3)).child("userBalance").getValue().toString();
                                             userBalance4.setText(userMoney4);
+                                            userMoneyBet4.setText(userBet);
+                                            if(betUser > currentMaxBet) {
+                                                currentMaxBet = betUser;
+                                                mSocket.emit("currentBet" ,currentMaxBet);
+                                            }
+
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
@@ -432,6 +716,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                     final String userId;
 
 
+
                     try {
                         userId = data.getString("username");
                         numUsers = data.getInt("numUsers");
@@ -443,7 +728,93 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                         mUsersDatabase.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
+
                                 username = dataSnapshot.child(userId).child("userName").getValue().toString();
+                                String userBalance = dataSnapshot.child(userId).child("userBalance").getValue().toString();
+                                String userBet = dataSnapshot.child(userId).child("userBet").getValue().toString();
+
+                                int betUser = Integer.parseInt(userBet);
+
+                                Toast.makeText(QuickmatchGameActivity.this, "" + currentMaxBet, Toast.LENGTH_SHORT).show();
+                                switch(numUsers) {
+                                    case 1:
+                                        Toast.makeText(QuickmatchGameActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+
+                                        break;
+                                    case 2:
+
+                                        userName1.setVisibility(View.VISIBLE);
+                                        userImage1.setVisibility(View.VISIBLE);
+                                        userBalance1.setVisibility(View.VISIBLE);
+                                        userMoneyBet1.setVisibility(View.VISIBLE);
+                                        dollarSign1.setVisibility(View.VISIBLE);
+                                        dollarSign5.setVisibility(View.VISIBLE);
+                                        userName1.setText(username);
+                                        userBalance1.setText(userBalance);
+                                        userMoneyBet1.setText(userBet);
+
+                                        if(betUser > currentMaxBet) {
+                                            currentMaxBet = betUser;
+                                            mSocket.emit("currentBet" ,currentMaxBet);
+                                        }
+
+
+                                        break;
+                                    case 3:
+                                        userName2.setVisibility(View.VISIBLE);
+                                        userImage2.setVisibility(View.VISIBLE);
+                                        userBalance2.setVisibility(View.VISIBLE);
+                                        userMoneyBet2.setVisibility(View.VISIBLE);
+                                        dollarSign2.setVisibility(View.VISIBLE);
+                                        dollarSign6.setVisibility(View.VISIBLE);
+                                        userName2.setText(username);
+                                        userBalance2.setText(userBalance);
+                                        userMoneyBet2.setText(userBet);
+
+                                        if(betUser > currentMaxBet) {
+                                            currentMaxBet = betUser;
+                                            mSocket.emit("currentBet" ,currentMaxBet);
+                                        }
+
+
+                                        break;
+                                    case 4:
+                                        userName3.setVisibility(View.VISIBLE);
+                                        userImage3.setVisibility(View.VISIBLE);
+                                        userBalance3.setVisibility(View.VISIBLE);
+                                        userMoneyBet3.setVisibility(View.VISIBLE);
+                                        dollarSign3.setVisibility(View.VISIBLE);
+                                        dollarSign7.setVisibility(View.VISIBLE);
+                                        userName3.setText(username);
+                                        userBalance3.setText(userBalance);
+                                        userMoneyBet3.setText(userBet);
+
+                                        if(betUser > currentMaxBet) {
+                                            currentMaxBet = betUser;
+                                            mSocket.emit("currentBet" ,currentMaxBet);
+                                        }
+
+                                        break;
+                                    case 5:
+                                        userName4.setVisibility(View.VISIBLE);
+                                        userImage4.setVisibility(View.VISIBLE);
+                                        userBalance4.setVisibility(View.VISIBLE);
+                                        userMoneyBet4.setVisibility(View.VISIBLE);
+                                        dollarSign4.setVisibility(View.VISIBLE);
+                                        dollarSign8.setVisibility(View.VISIBLE);
+                                        userName4.setText(username);
+                                        userBalance4.setText(userBalance);
+                                        userMoneyBet4.setText(userBet);
+
+
+                                        if(betUser > currentMaxBet) {
+                                            currentMaxBet = betUser;
+                                            mSocket.emit("currentBet" ,currentMaxBet);
+                                        }
+
+                                        break;
+
+                                }
 
                             }
 
@@ -453,31 +824,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                             }
                         });
 
-                        switch(numUsers) {
-                            case 1:
-                                Toast.makeText(QuickmatchGameActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
 
-                                break;
-                            case 2:
-
-                                if(usersList.getString(1) != userId) {
-                                    userName1.setText(username);
-                                } else {
-                                    Toast.makeText(QuickmatchGameActivity.this, "It is you", Toast.LENGTH_SHORT).show();
-                                }
-
-                                break;
-                            case 3:
-                                userName2.setText(username);
-                                break;
-                            case 4:
-                                userName3.setText(username);
-                                break;
-                            case 5:
-                                userName4.setText(username);
-                                break;
-
-                        }
 
 
 
@@ -572,12 +919,11 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                          round = data.getInt("gameState");
                         // tableBet = data.getInt("tableBet");
 
-
                         tableInitialCards = data.getJSONArray("firstThreeCardsTable");
                         //amountMoneyBet.setText(tableBet);
+                       // Toast.makeText(QuickmatchGameActivity.this, "" + tableInitialCards, Toast.LENGTH_SHORT).show();
 
 
-                        Toast.makeText(QuickmatchGameActivity.this, "" + tableInitialCards, Toast.LENGTH_SHORT).show();
                         String mCardName1 = tableInitialCards.getString(0);
                         String mCardName2 = tableInitialCards.getString(1);
                         String mCardName3 = tableInitialCards.getString(2);
@@ -696,15 +1042,47 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                 public void run() {
                     JSONObject data = (JSONObject) args[0];
 
+
+                    mSocket.emit("EndGameResults");
+
                     JSONArray round;
                     //int tableBet;
 
                     try {
                         //tableBet = data.getInt("tableBet");
                         round = data.getJSONArray("finalRoundCard");
-                        Toast.makeText(QuickmatchGameActivity.this, "" + round.getString(0), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(QuickmatchGameActivity.this, "" + round.getString(0), Toast.LENGTH_SHORT).show();
 
                        // amountMoneyBet.setText(tableBet);
+
+
+                    } catch (JSONException e) {
+
+                        return;
+                    }
+
+                }
+            });
+        }
+    };
+
+
+    private Emitter.Listener onResults = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+
+                    String myCards;
+
+                    try {
+                        myCards = data.getString("userHandCompare");
+
+                        Toast.makeText(QuickmatchGameActivity.this, "" + myCards, Toast.LENGTH_SHORT).show();
+
+                        // amountMoneyBet.setText(tableBet);
 
 
                     } catch (JSONException e) {
@@ -769,7 +1147,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                     try {
 
                         round = data.getInt("turnState");
-                        Toast.makeText(QuickmatchGameActivity.this, "" + round, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(QuickmatchGameActivity.this, "" + round, Toast.LENGTH_SHORT).show();
 
 
                         if(round ==userPosition) {
@@ -806,18 +1184,17 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
                         currentBet = data.getInt("currentBet");
                         userBetter = data.getString("better");
-                        //Toast.makeText(QuickmatchGameActivity.this, "" + currentBet + "   " + userBetter, Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(QuickmatchGameActivity.this, "" + currentBet + "   " + userBetter, Toast.LENGTH_SHORT).show();
+
+
+                        
 
 
                         mUsersDatabase.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
+
                                 username = dataSnapshot.child(userBetter).child("userName").getValue().toString();
-
-
-
-
-
 
 
                             }

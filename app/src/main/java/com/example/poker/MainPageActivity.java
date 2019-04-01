@@ -81,6 +81,9 @@ public class MainPageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                Intent intent = new Intent(MainPageActivity.this, JoinGameActivity.class);
+                startActivity(intent);
+
             }
         });
 
@@ -88,6 +91,9 @@ public class MainPageActivity extends AppCompatActivity {
         buttonCreateTable.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                Intent intent = new Intent(MainPageActivity.this, CreateGameActivity.class);
+                startActivity(intent);
 
             }
         });

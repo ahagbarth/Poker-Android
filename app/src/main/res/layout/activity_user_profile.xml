@@ -31,6 +31,7 @@
         android:layout_marginTop="8dp"
         android:text="TextView"
         android:textSize="30sp"
+        android:textColor="@color/colorSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView3" />
@@ -44,6 +45,7 @@
         android:layout_marginRight="40dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="200dp"
+        android:textColor="@color/colorSecondary"
         android:text="Level:"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -60,7 +62,8 @@
         android:text="00"
         android:textSize="24sp"
         app:layout_constraintStart_toEndOf="@+id/textView5"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/colorSecondary"/>
 
     <TextView
         android:id="@+id/userLevel2"
@@ -71,6 +74,7 @@
         android:layout_marginTop="240dp"
         android:text="00"
         android:textSize="16sp"
+        android:textColor="@color/colorSecondary"
         app:layout_constraintEnd_toStartOf="@+id/progressBar2"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -84,6 +88,7 @@
         android:layout_marginRight="200dp"
         android:layout_marginStart="200dp"
         android:layout_marginTop="240dp"
+        android:backgroundTint="@color/colorSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -97,6 +102,7 @@
         android:layout_marginRight="40dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="30dp"
+        android:textColor="@color/colorSecondary"
         android:text="Exp:"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -109,6 +115,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="30dp"
+        android:textColor="@color/colorSecondary"
         android:text="000"
         app:layout_constraintStart_toEndOf="@+id/textView4"
         app:layout_constraintTop_toBottomOf="@+id/userLevel" />
@@ -123,6 +130,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:text="Player Stats"
+        android:background="@color/colorSecondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

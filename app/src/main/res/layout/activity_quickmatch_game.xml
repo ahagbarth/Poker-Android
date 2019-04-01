@@ -23,13 +23,13 @@
         android:id="@+id/userMoneyBet2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginRight="25dp"
         android:layout_marginTop="120dp"
         android:text="0"
         android:textSize="18sp"
         app:layout_constraintEnd_toStartOf="@+id/UserImage2"
-        app:layout_constraintTop_toTopOf="@+id/textView15" />
+        app:layout_constraintTop_toTopOf="@+id/dollarSign5" />
 
     <ImageView
         android:id="@+id/imageView6"
@@ -245,7 +245,7 @@
         app:layout_constraintTop_toBottomOf="@+id/UserImage3" />
 
     <TextView
-        android:id="@+id/textView14"
+        android:id="@+id/dollarSign8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="$"
@@ -253,7 +253,7 @@
         app:layout_constraintTop_toTopOf="@+id/userMoney4" />
 
     <TextView
-        android:id="@+id/textView15"
+        android:id="@+id/dollarSign5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="$"
@@ -261,7 +261,7 @@
         app:layout_constraintTop_toTopOf="@+id/userMoney1" />
 
     <TextView
-        android:id="@+id/textView17"
+        android:id="@+id/dollarSign7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="$"
@@ -269,7 +269,7 @@
         app:layout_constraintTop_toTopOf="@+id/userMoney3" />
 
     <TextView
-        android:id="@+id/textView18"
+        android:id="@+id/dollarSign6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="$"
@@ -431,10 +431,13 @@
         android:layout_width="38dp"
         android:layout_height="52dp"
         android:layout_marginBottom="24dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginEnd="48dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="48dp"
+        android:layout_marginStart="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/guideline4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/cardback" />
 
     <ImageView
@@ -442,10 +445,13 @@
         android:layout_width="38dp"
         android:layout_height="52dp"
         android:layout_marginBottom="24dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="48dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/cardback" />
 
     <TextView
@@ -467,8 +473,8 @@
         android:id="@+id/userMoneyBet1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginRight="25dp"
         android:layout_marginTop="90dp"
         android:text="0"
         android:textSize="18sp"
@@ -488,7 +494,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView10"
+        android:id="@+id/dollarSign2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="120dp"
@@ -508,7 +514,7 @@
         app:layout_constraintStart_toEndOf="@+id/currentUserBet" />
 
     <TextView
-        android:id="@+id/textView22"
+        android:id="@+id/dollarSign3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="70dp"
@@ -518,7 +524,7 @@
         app:layout_constraintStart_toEndOf="@+id/userMoneyBet3" />
 
     <TextView
-        android:id="@+id/textView21"
+        android:id="@+id/dollarSign1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="90dp"
@@ -528,7 +534,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView12"
+        android:id="@+id/dollarSign4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="90dp"
