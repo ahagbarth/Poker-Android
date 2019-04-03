@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
@@ -54,6 +55,21 @@ public class JoinGameActivity extends AppCompatActivity {
             @Override
             protected void populateViewHolder(GamesViewHolder viewHolder, Games model, int position) {
                 viewHolder.setName(model.getGameName());
+
+
+                final String tableName =  getRef(position).getKey();
+
+                viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+
+                        Intent profileIntent = new Intent(JoinGameActivity.this, QuickmatchGameActivity.class);
+                        profileIntent.putExtra("RoomName", tableName);
+                        startActivity(profileIntent);
+
+                    }
+                });
 
             }
 
