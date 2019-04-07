@@ -87,13 +87,13 @@ public class UsernameActivity extends AppCompatActivity {
         editTextDisplayName = findViewById(R.id.editTextDisplayName);
 
         final String displayName = editTextDisplayName.getText().toString();
-/*
+
                 if(displayName.isEmpty()) {
-                    editTextDisplayName.setError("Name required");
+                    editTextDisplayName.setError("Name is required");
                     editTextDisplayName.requestFocus();
                     return;
                 }
-*/
+
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                 .setDisplayName(displayName)
                 //.setPhotoUri(Uri.parse("https://example.com/jane-q-user/profile.jpg"))

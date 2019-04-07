@@ -64,6 +64,8 @@ public class MainPageActivity extends AppCompatActivity {
         buttonSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent settings = new Intent(MainPageActivity.this,  SettingsActivity.class);
+                startActivity(settings);
 
             }
         });
@@ -121,7 +123,6 @@ public class MainPageActivity extends AppCompatActivity {
             String name = user.getDisplayName();
             userName = findViewById(R.id.userName);
             userName.setText(name);
-
             userBalance = findViewById(R.id.userBalance);
 
             mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());

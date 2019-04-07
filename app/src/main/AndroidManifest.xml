@@ -55,7 +55,10 @@
         <activity
             android:name=".CreateGameActivity"
             android:screenOrientation="sensorLandscape" />
-        <activity android:name=".JoinGameActivity"
+        <activity
+            android:name=".JoinGameActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity android:name=".SettingsActivity"
             android:screenOrientation="sensorLandscape"></activity>
     </application>
 

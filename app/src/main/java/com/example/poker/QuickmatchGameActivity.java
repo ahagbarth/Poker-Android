@@ -48,6 +48,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
     TextView dollarSign1, dollarSign2, dollarSign3, dollarSign4, dollarSign5, dollarSign6, dollarSign7, dollarSign8;
 
     private DatabaseReference mUsersDatabase;
+    private DatabaseReference mGamesDatabase;
 
     String username;
 
@@ -62,6 +63,8 @@ public class QuickmatchGameActivity extends AppCompatActivity {
     int userPosition;
     String currentUserMoney;
     int currentMoney;
+    String currentGameState;
+    int currentState;
 
     //Whether user is playing, spectating, or offline
     enum UserStatus {
@@ -74,11 +77,11 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
     Boolean myTurn = false;
 
-    Button buttonBet, buttonCall, buttonFold;
+    Button buttonBet, buttonCall, buttonFold, buttonGameState;
 
     int currentMaxBet = 0;
 
-
+    String roomName;
 
     //declares what server to connect to
     private Socket mSocket;
@@ -105,8 +108,9 @@ public class QuickmatchGameActivity extends AppCompatActivity {
             userId = user.getUid();
         }
 
-        //Firebase Database for users
+        //Firebase Databases
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
+        mGamesDatabase = FirebaseDatabase.getInstance().getReference().child("Games");
 
 
         //Connect app to server when this activity is entered
@@ -216,10 +220,12 @@ public class QuickmatchGameActivity extends AppCompatActivity {
         buttonBet = findViewById(R.id.buttonBet);
         buttonCall = findViewById(R.id.buttonCall);
         buttonFold = findViewById(R.id.buttonFold);
+        buttonGameState = findViewById(R.id.buttonGameState);
 
         //Display turn signal
         turnDisplay = findViewById(R.id.turnDisplay);
         turnDisplay.setVisibility(View.GONE);
+
 
 
         buttonBet.setOnClickListener(new View.OnClickListener() {
@@ -304,7 +310,47 @@ public class QuickmatchGameActivity extends AppCompatActivity {
         buttonFold.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSocket.emit("change game state", "");
+
+
+            }
+        });
+        buttonGameState.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                mGamesDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        currentGameState = dataSnapshot.child(roomName).child("gameState").getValue().toString();
+                        currentState = Integer.parseInt(currentGameState);
+                        int finalState = currentState + 1;
+
+                        if (finalState == 5){
+                            finalState = 0;
+                        }
+
+                        DatabaseReference refUser = mGamesDatabase.child(roomName);
+                        Map<String, Object> updateMoney = new HashMap<>();
+                        updateMoney.put("gameState", finalState);
+
+
+                        mSocket.emit("change game state", currentGameState);
+
+                        refUser.updateChildren(updateMoney);
+
+
+
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
 
             }
         });
@@ -381,7 +427,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
                     //Room Name
                     Intent intent = getIntent();
-                    String roomName = intent.getStringExtra("RoomName");
+                    roomName = intent.getStringExtra("RoomName");
                     Toast.makeText(QuickmatchGameActivity.this, roomName, Toast.LENGTH_SHORT).show();
 
                     mSocket.emit("add user", userId);
@@ -427,7 +473,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                         userPosition = data.getInt("userPosition");
 
                         //Toast.makeText(QuickmatchGameActivity.this, "" + userPosition, Toast.LENGTH_SHORT).show();
-
+                        Toast.makeText(QuickmatchGameActivity.this, ""+numUsers, Toast.LENGTH_SHORT).show();
                         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
 
                         mUsersDatabase.addValueEventListener(new ValueEventListener() {
@@ -722,7 +768,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                         numUsers = data.getInt("numUsers");
                         usersList = data.getJSONArray("users");
 
-
+                        Toast.makeText(QuickmatchGameActivity.this, "User Joined", Toast.LENGTH_SHORT).show();
 
 
                         mUsersDatabase.addValueEventListener(new ValueEventListener() {
@@ -735,7 +781,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
                                 int betUser = Integer.parseInt(userBet);
 
-                                Toast.makeText(QuickmatchGameActivity.this, "" + currentMaxBet, Toast.LENGTH_SHORT).show();
+                               // Toast.makeText(QuickmatchGameActivity.this, "" + currentMaxBet, Toast.LENGTH_SHORT).show();
                                 switch(numUsers) {
                                     case 1:
                                         Toast.makeText(QuickmatchGameActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();

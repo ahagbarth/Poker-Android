@@ -51,7 +51,15 @@ public class SignupActivity extends AppCompatActivity {
                 String email = editTextEmail.getText().toString().trim();
                 String password = editTextPassword.getText().toString().trim();
 
-                createAccount(email , password);
+                if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    editTextEmail.setError("enter a valid email address");
+                } else if (password.isEmpty() || password.length() < 6 || password.length() > 14) {
+                    editTextPassword.setError("Password should be between 6 and 14 characters");
+                } else {
+                    createAccount(email , password);
+                }
+
+
             }
         });
 
@@ -59,30 +67,21 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     private void createAccount(String email, String password) {
-
-
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information#
+
                             Toast.makeText(SignupActivity.this, "Account Created!", Toast.LENGTH_SHORT).show();
-                            FirebaseUser user = mAuth.getCurrentUser();
-                           // updateUI(user);
 
                             Intent createdAccount = new Intent(SignupActivity.this, UsernameActivity.class);
                             startActivity(createdAccount);
 
-
                         } else {
-                            // If sign in fails, display a message to the user.
-                            //Log.w(TAG, "createUserWithEmail:failure", task.getException());
                             Toast.makeText(SignupActivity.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
-                           // updateUI(null);
                         }
 
-                        // ...
                     }
                 });
     }

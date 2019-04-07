@@ -52,7 +52,7 @@ public class CreateGameActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
 
-                        mGamesDatabases.child(roomName.getText().toString()).child("numUsers").setValue(0).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        mGamesDatabases.child(roomName.getText().toString()).child("gameState").setValue(0).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 Toast.makeText(CreateGameActivity.this, "Game Created", Toast.LENGTH_SHORT).show();

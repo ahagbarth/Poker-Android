@@ -58,7 +58,13 @@ public class LoginActivity extends AppCompatActivity {
                 String email = editTextEmail.getText().toString().trim();
                 String password = editTextPassword.getText().toString().trim();
 
-                signIn(email, password);
+                if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    editTextEmail.setError("enter a valid email address");
+                } else if (password.isEmpty() || password.length() < 6 || password.length() > 14) {
+                    editTextPassword.setError("Password should be between 6 and 14 characters");
+                } else {
+                    signIn(email, password);
+                }
             }
         });
 
@@ -68,30 +74,19 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     protected void signIn(String email, String password) {
-        final Task<AuthResult> authResultTask = mAuth.signInWithEmailAndPassword(email, password)
+        mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            //Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
                             Toast.makeText(LoginActivity.this, "Signed In", Toast.LENGTH_SHORT).show();
-                            loggedIn(user);
-
+                            loggedIn();
 
                         } else {
-                            // If sign in fails, display a message to the user.
-                            //Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                            //updateUI(null);
+                            Toast.makeText(LoginActivity.this, "Authentication failed", Toast.LENGTH_SHORT).show();
                         }
-
-                        // ...
                     }
                 });
-
     }
 
 
@@ -99,22 +94,21 @@ public class LoginActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
 
-        // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser!= null){
             Toast.makeText(this, "Already Logged In", Toast.LENGTH_SHORT).show();
-            loggedIn(currentUser);
+            loggedIn();
 
         }
-        //updateUI(currentUser);
 
     }
 
-    public void loggedIn(FirebaseUser currentuser) {
+    public void loggedIn() {
         Intent loggedIn = new Intent(LoginActivity.this, MainPageActivity.class);
         startActivity(loggedIn);
 
     }
+
 
 }
 
