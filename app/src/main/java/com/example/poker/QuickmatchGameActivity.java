@@ -264,7 +264,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                             Map<String, Object> updateMoney = new HashMap<>();
                             updateMoney.put("userBalance", finalmoney);
 
-                                updateMoney.put("userBet", 10);
+                            updateMoney.put("userBet", 10);
 
 
 
@@ -430,8 +430,10 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                     roomName = intent.getStringExtra("RoomName");
                     Toast.makeText(QuickmatchGameActivity.this, roomName, Toast.LENGTH_SHORT).show();
 
-                    mSocket.emit("add user", userId);
                     mSocket.emit("room", roomName);
+                    mSocket.emit("add user", userId);
+                    //mSocket.emit("joined" );
+
 
                 }
             });
@@ -731,9 +733,9 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                         //This is to check if table seat is available
                         if(tableState.equals("available")){
                             currentUserName.setText(userName);
-                           // Toast.makeText(QuickmatchGameActivity.this, "You have joined a table", Toast.LENGTH_SHORT).show();
+                            // Toast.makeText(QuickmatchGameActivity.this, "You have joined a table", Toast.LENGTH_SHORT).show();
                         } else {
-                           // Toast.makeText(QuickmatchGameActivity.this, "You are in waiting list " + waitingList, Toast.LENGTH_SHORT).show();
+                            // Toast.makeText(QuickmatchGameActivity.this, "You are in waiting list " + waitingList, Toast.LENGTH_SHORT).show();
 
                         }
                         //adds already online people to the chairs
@@ -781,7 +783,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
                                 int betUser = Integer.parseInt(userBet);
 
-                               // Toast.makeText(QuickmatchGameActivity.this, "" + currentMaxBet, Toast.LENGTH_SHORT).show();
+                                // Toast.makeText(QuickmatchGameActivity.this, "" + currentMaxBet, Toast.LENGTH_SHORT).show();
                                 switch(numUsers) {
                                     case 1:
                                         Toast.makeText(QuickmatchGameActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
@@ -900,7 +902,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                         numUsers = data.getInt("numUsers");
                         usersList = data.getJSONArray("users");
 
-                       // Toast.makeText(QuickmatchGameActivity.this, "" + usersList, Toast.LENGTH_SHORT).show();
+                        // Toast.makeText(QuickmatchGameActivity.this, "" + usersList, Toast.LENGTH_SHORT).show();
                         mUsersDatabase.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -957,17 +959,17 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                 public void run() {
                     JSONObject data = (JSONObject) args[0];
                     int round;
-                   // int tableBet;
+                    // int tableBet;
 
 
                     try {
 
-                         round = data.getInt("gameState");
+                        round = data.getInt("gameState");
                         // tableBet = data.getInt("tableBet");
 
                         tableInitialCards = data.getJSONArray("firstThreeCardsTable");
                         //amountMoneyBet.setText(tableBet);
-                       // Toast.makeText(QuickmatchGameActivity.this, "" + tableInitialCards, Toast.LENGTH_SHORT).show();
+                        // Toast.makeText(QuickmatchGameActivity.this, "" + tableInitialCards, Toast.LENGTH_SHORT).show();
 
 
                         String mCardName1 = tableInitialCards.getString(0);
@@ -1054,7 +1056,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
                     try {
                         roundThree = data.getJSONArray("finalRoundCard");
-                       // tableBet = data.getInt("tableBet");
+                        // tableBet = data.getInt("tableBet");
 
                         //amountMoneyBet.setText(tableBet);
 
@@ -1099,7 +1101,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                         round = data.getJSONArray("finalRoundCard");
                         //Toast.makeText(QuickmatchGameActivity.this, "" + round.getString(0), Toast.LENGTH_SHORT).show();
 
-                       // amountMoneyBet.setText(tableBet);
+                        // amountMoneyBet.setText(tableBet);
 
 
                     } catch (JSONException e) {
@@ -1230,10 +1232,10 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
                         currentBet = data.getInt("currentBet");
                         userBetter = data.getString("better");
-                       // Toast.makeText(QuickmatchGameActivity.this, "" + currentBet + "   " + userBetter, Toast.LENGTH_SHORT).show();
+                        // Toast.makeText(QuickmatchGameActivity.this, "" + currentBet + "   " + userBetter, Toast.LENGTH_SHORT).show();
 
 
-                        
+
 
 
                         mUsersDatabase.addValueEventListener(new ValueEventListener() {
