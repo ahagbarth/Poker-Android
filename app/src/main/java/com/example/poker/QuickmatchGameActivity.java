@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.bumptech.glide.Glide;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 import com.github.nkzawa.emitter.Emitter;
@@ -23,6 +24,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -298,6 +300,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
 
             }
+
         });
 
         buttonCall.setOnClickListener(new View.OnClickListener() {
@@ -354,8 +357,6 @@ public class QuickmatchGameActivity extends AppCompatActivity {
 
             }
         });
-
-
 
 
 
@@ -430,9 +431,9 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                     roomName = intent.getStringExtra("RoomName");
                     Toast.makeText(QuickmatchGameActivity.this, roomName, Toast.LENGTH_SHORT).show();
 
-                    mSocket.emit("room", roomName);
+
                     mSocket.emit("add user", userId);
-                    //mSocket.emit("joined" );
+                    mSocket.emit("room", roomName);
 
 
                 }
@@ -474,6 +475,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                         usersList = data.getJSONArray("users");
                         userPosition = data.getInt("userPosition");
 
+
                         //Toast.makeText(QuickmatchGameActivity.this, "" + userPosition, Toast.LENGTH_SHORT).show();
                         Toast.makeText(QuickmatchGameActivity.this, ""+numUsers, Toast.LENGTH_SHORT).show();
                         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
@@ -491,10 +493,40 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                                 int userNumber = usersList.length();
                                 //Toast.makeText(QuickmatchGameActivity.this, "userNumber: " + userNumber + " / numUsers:   " + numUsers + "  / userList: " + usersList, Toast.LENGTH_SHORT).show();
                                 currentUserBalance.setText(currentUserMoney);
+                                String currentImage = dataSnapshot.child(userId).child("imageURI").getValue().toString();
+                                Picasso.with(getApplicationContext()).load(currentImage).resize(200,200).into(CurrentUserImage);
 
                                 switch(numUsers) {
 
                                     case 1:
+
+                                        mGamesDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                                String numberUsers = dataSnapshot.child(roomName).child("numUsers").getValue().toString();
+                                                int currentUserNumber = Integer.parseInt(numberUsers);
+
+                                                DatabaseReference referenceUserNumber = mGamesDatabase.child(roomName);
+                                                Map<String, Object> updateNumber = new HashMap<>();
+                                                updateNumber.put("gameState", 0);
+
+
+                                                mSocket.emit("change game state", 0);
+
+                                                referenceUserNumber.updateChildren(updateNumber);
+
+
+
+
+                                            }
+
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {
+
+                                            }
+                                        });
+
 
                                         break;
                                     case 2:
@@ -513,10 +545,14 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                                             String userMoney1 = dataSnapshot.child(usersList.getString(0)).child("userBalance").getValue().toString();
                                             userBalance1.setText(userMoney1);
 
+                                            String UserImage = dataSnapshot.child(usersList.getString(0)).child("imageURI").getValue().toString();
+                                            Picasso.with(getApplicationContext()).load(UserImage).resize(200,200).into(userImage1);
+
                                             if(betUser >= currentMaxBet) {
                                                 currentMaxBet = betUser;
                                                 mSocket.emit("currentBet" ,currentMaxBet);
                                             }
+
 
                                         } catch (JSONException e) {
                                             e.printStackTrace();
@@ -535,6 +571,8 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                                             String userMoney1 = dataSnapshot.child(usersList.getString(0)).child("userBalance").getValue().toString();
                                             userBalance1.setText(userMoney1);
                                             userMoneyBet1.setText(userBet);
+                                            String UserImage = dataSnapshot.child(usersList.getString(0)).child("imageURI").getValue().toString();
+                                            Picasso.with(getApplicationContext()).load(UserImage).resize(200,200).into(userImage1);
                                             if(betUser > currentMaxBet) {
                                                 currentMaxBet = betUser;
                                                 mSocket.emit("currentBet" ,currentMaxBet);
@@ -555,7 +593,8 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                                             String userMoney2 = dataSnapshot.child(usersList.getString(1)).child("userBalance").getValue().toString();
                                             userBalance2.setText(userMoney2);
                                             userMoneyBet2.setText(userBet);
-
+                                            String UserImage2 = dataSnapshot.child(usersList.getString(1)).child("imageURI").getValue().toString();
+                                            Picasso.with(getApplicationContext()).load(UserImage2).resize(200,200).into(userImage2);
                                             if(betUser > currentMaxBet) {
                                                 currentMaxBet = betUser;
                                                 mSocket.emit("currentBet" ,currentMaxBet);
@@ -578,7 +617,8 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                                             userName1.setText(name1);
                                             String userMoney1 = dataSnapshot.child(usersList.getString(0)).child("userBalance").getValue().toString();
                                             userBalance1.setText(userMoney1);
-
+                                            String UserImage1 = dataSnapshot.child(usersList.getString(0)).child("imageURI").getValue().toString();
+                                            Picasso.with(getApplicationContext()).load(UserImage1).resize(200,200).into(userImage1);
                                             if(betUser > currentMaxBet) {
                                                 currentMaxBet = betUser;
                                                 mSocket.emit("currentBet" ,currentMaxBet);
@@ -600,6 +640,8 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                                             String userMoney2 = dataSnapshot.child(usersList.getString(1)).child("userBalance").getValue().toString();
                                             userBalance2.setText(userMoney2);
                                             userMoneyBet2.setText(userBet);
+                                            String UserImage2 = dataSnapshot.child(usersList.getString(1)).child("imageURI").getValue().toString();
+                                            Picasso.with(getApplicationContext()).load(UserImage2).resize(200,200).into(userImage2);
                                             if(betUser > currentMaxBet) {
                                                 currentMaxBet = betUser;
                                                 mSocket.emit("currentBet" ,currentMaxBet);
@@ -620,6 +662,8 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                                             String userMoney3 = dataSnapshot.child(usersList.getString(2)).child("userBalance").getValue().toString();
                                             userBalance3.setText(userMoney3);
                                             userMoneyBet3.setText(userBet);
+                                            String UserImage3 = dataSnapshot.child(usersList.getString(2)).child("imageURI").getValue().toString();
+                                            Picasso.with(getApplicationContext()).load(UserImage3).resize(200,200).into(userImage3);
                                             if(betUser > currentMaxBet) {
                                                 currentMaxBet = betUser;
                                                 mSocket.emit("currentBet" ,currentMaxBet);
@@ -642,6 +686,8 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                                             String userMoney1 = dataSnapshot.child(usersList.getString(0)).child("userBalance").getValue().toString();
                                             userBalance1.setText(userMoney1);
                                             userMoneyBet1.setText(userBet);
+                                            String UserImage1 = dataSnapshot.child(usersList.getString(0)).child("imageURI").getValue().toString();
+                                            Picasso.with(getApplicationContext()).load(UserImage1).resize(200,200).into(userImage1);
                                             if(betUser > currentMaxBet) {
                                                 currentMaxBet = betUser;
                                                 mSocket.emit("currentBet" ,currentMaxBet);
@@ -663,6 +709,8 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                                             String userMoney2 = dataSnapshot.child(usersList.getString(1)).child("userBalance").getValue().toString();
                                             userBalance2.setText(userMoney2);
                                             userMoneyBet2.setText(userBet);
+                                            String UserImage2 = dataSnapshot.child(usersList.getString(1)).child("imageURI").getValue().toString();
+                                            Picasso.with(getApplicationContext()).load(UserImage2).resize(200,200).into(userImage2);
                                             if(betUser > currentMaxBet) {
                                                 currentMaxBet = betUser;
                                                 mSocket.emit("currentBet" ,currentMaxBet);
@@ -684,6 +732,8 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                                             String userMoney3 = dataSnapshot.child(usersList.getString(2)).child("userBalance").getValue().toString();
                                             userBalance3.setText(userMoney3);
                                             userMoneyBet3.setText(userBet);
+                                            String UserImage3 = dataSnapshot.child(usersList.getString(2)).child("imageURI").getValue().toString();
+                                            Picasso.with(getApplicationContext()).load(UserImage3).resize(200,200).into(userImage3);
                                             if(betUser > currentMaxBet) {
                                                 currentMaxBet = betUser;
                                                 mSocket.emit("currentBet" ,currentMaxBet);
@@ -704,6 +754,8 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                                             String userMoney4 = dataSnapshot.child(usersList.getString(3)).child("userBalance").getValue().toString();
                                             userBalance4.setText(userMoney4);
                                             userMoneyBet4.setText(userBet);
+                                            String UserImage4 = dataSnapshot.child(usersList.getString(3)).child("imageURI").getValue().toString();
+                                            Picasso.with(getApplicationContext()).load(UserImage4).resize(200,200).into(userImage4);
                                             if(betUser > currentMaxBet) {
                                                 currentMaxBet = betUser;
                                                 mSocket.emit("currentBet" ,currentMaxBet);
@@ -780,6 +832,8 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                                 username = dataSnapshot.child(userId).child("userName").getValue().toString();
                                 String userBalance = dataSnapshot.child(userId).child("userBalance").getValue().toString();
                                 String userBet = dataSnapshot.child(userId).child("userBet").getValue().toString();
+                                String UserImage = dataSnapshot.child(userId).child("imageURI").getValue().toString();
+
 
                                 int betUser = Integer.parseInt(userBet);
 
@@ -800,6 +854,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                                         userName1.setText(username);
                                         userBalance1.setText(userBalance);
                                         userMoneyBet1.setText(userBet);
+                                        Picasso.with(getApplicationContext()).load(UserImage).resize(200,200).into(userImage1);
 
                                         if(betUser > currentMaxBet) {
                                             currentMaxBet = betUser;
@@ -818,6 +873,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                                         userName2.setText(username);
                                         userBalance2.setText(userBalance);
                                         userMoneyBet2.setText(userBet);
+                                        Picasso.with(getApplicationContext()).load(UserImage).resize(200,200).into(userImage2);
 
                                         if(betUser > currentMaxBet) {
                                             currentMaxBet = betUser;
@@ -836,7 +892,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                                         userName3.setText(username);
                                         userBalance3.setText(userBalance);
                                         userMoneyBet3.setText(userBet);
-
+                                        Picasso.with(getApplicationContext()).load(UserImage).resize(200,200).into(userImage3);
                                         if(betUser > currentMaxBet) {
                                             currentMaxBet = betUser;
                                             mSocket.emit("currentBet" ,currentMaxBet);
@@ -853,7 +909,7 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                                         userName4.setText(username);
                                         userBalance4.setText(userBalance);
                                         userMoneyBet4.setText(userBet);
-
+                                        Picasso.with(getApplicationContext()).load(UserImage).resize(200,200).into(userImage4);
 
                                         if(betUser > currentMaxBet) {
                                             currentMaxBet = betUser;
@@ -907,6 +963,47 @@ public class QuickmatchGameActivity extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 username = dataSnapshot.child(userId).child("userName").getValue().toString();
+                                Toast.makeText(QuickmatchGameActivity.this, ""+ numUsers, Toast.LENGTH_SHORT).show();
+
+                                if(userName1.getText().toString() == username){
+
+
+
+
+                                    userName1.setVisibility(View.GONE);
+                                    userImage1.setVisibility(View.GONE);
+                                    userBalance1.setVisibility(View.GONE);
+                                    userMoneyBet1.setVisibility(View.GONE);
+                                    dollarSign1.setVisibility(View.GONE);
+                                    dollarSign4.setVisibility(View.GONE);
+
+
+
+                                }
+                                if(userName2.getText().toString() == username){
+                                    userName2.setVisibility(View.GONE);
+                                    userImage2.setVisibility(View.GONE);
+                                    userBalance2.setVisibility(View.GONE);
+                                    userMoneyBet2.setVisibility(View.GONE);
+                                    dollarSign2.setVisibility(View.GONE);
+                                    dollarSign5.setVisibility(View.GONE);
+                                }
+                                if(userName3.getText().toString() == username){
+                                    userName3.setVisibility(View.GONE);
+                                    userImage3.setVisibility(View.GONE);
+                                    userBalance3.setVisibility(View.GONE);
+                                    userMoneyBet3.setVisibility(View.GONE);
+                                    dollarSign3.setVisibility(View.GONE);
+                                    dollarSign7.setVisibility(View.GONE);
+                                }
+                                if(userName4.getText().toString() == username){
+                                    userName4.setVisibility(View.GONE);
+                                    userImage4.setVisibility(View.GONE);
+                                    userBalance4.setVisibility(View.GONE);
+                                    userMoneyBet4.setVisibility(View.GONE);
+                                    dollarSign4.setVisibility(View.GONE);
+                                    dollarSign8.setVisibility(View.GONE);
+                                }
 
                             }
 

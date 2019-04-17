@@ -1,5 +1,6 @@
 package com.example.poker;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -16,8 +17,10 @@ import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -78,19 +81,20 @@ public class FriendsActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        FirebaseRecyclerAdapter<Users, UsersViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Users, UsersViewHolder>(
+        FirebaseRecyclerAdapter<Stats, UsersViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Stats, UsersViewHolder>(
 
-                Users.class,
+                Stats.class,
                 R.layout.card,
                 UsersViewHolder.class,
-                mUsersDatabase.orderByChild("userName")
+                mUsersDatabase
 
         ) {
 
             @Override
-            protected void populateViewHolder(UsersViewHolder viewHolder, Users model, int position) {
+            protected void populateViewHolder(UsersViewHolder viewHolder, Stats model, int position) {
 
                     viewHolder.setName(model.getUserName());
+                    viewHolder.setImage(model.getImage(), getApplicationContext());
 
                 //String databaseUser = model.getUserName();
 
@@ -127,6 +131,10 @@ public class FriendsActivity extends AppCompatActivity {
         public void setName(String name) {
             TextView userNameView = mView.findViewById(R.id.user_single_name);
             userNameView.setText(name);
+        }
+        public void setImage(String image, Context context) {
+            ImageView imageView = mView.findViewById(R.id.user_single_image);
+            Glide.with(context).load(image).into(imageView);
         }
 
 

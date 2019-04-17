@@ -1,5 +1,7 @@
 package com.example.poker;
 
+import android.net.Uri;
+
 public class Stats {
     String userId;
     String userName;
@@ -9,12 +11,13 @@ public class Stats {
     int userLoss;
     int userBalance;
     int userBet;
+    String imageURI;
 
     public Stats(){
 
     }
 
-    public Stats(String userId, String userName, int userLevel, int userEXP, int userWins, int userLoss, int userBalance, int userBet) {
+    public Stats(String userId, String userName, int userLevel, int userEXP, int userWins, int userLoss, int userBalance, int userBet, String imageURI) {
         this.userId = userId;
         this.userName = userName;
         this.userLevel = userLevel;
@@ -23,6 +26,7 @@ public class Stats {
         this.userLoss = userLoss;
         this.userBalance = userBalance;
         this.userBet = userBet;
+        this.imageURI = imageURI;
     }
 
 
@@ -88,5 +92,13 @@ public class Stats {
 
     public void setUserBet(int userBet) {
         this.userBet = userBet;
+    }
+
+    public String getImage() {
+        return imageURI;
+    }
+
+    public void setImage(String image) {
+        this.imageURI = image;
     }
 }

@@ -1,6 +1,7 @@
 package com.example.poker;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,9 +9,11 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,6 +45,7 @@ public class FriendProfileActivity extends AppCompatActivity {
     private Button mAcceptRequest;
     private Button mUnfriend;
     private TextView mUserLevel;
+    private ImageView mProfileImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +63,7 @@ public class FriendProfileActivity extends AppCompatActivity {
         mAcceptRequest = findViewById(R.id.buttonAcceptRequest);
         mUnfriend = findViewById(R.id.buttonUnfriend);
         mUserLevel = findViewById(R.id.userLevel);
+        mProfileImage = findViewById(R.id.profileImage);
 
 
         //Setting initial friend state
@@ -74,6 +79,9 @@ public class FriendProfileActivity extends AppCompatActivity {
         mFriendsDatabase = FirebaseDatabase.getInstance().getReference().child("Friends");
 
 
+
+
+
         //Receiving user data
         mUsersDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -82,6 +90,11 @@ public class FriendProfileActivity extends AppCompatActivity {
                 //This is to retrieve name and level info from user
                 userName = dataSnapshot.child("userName").getValue().toString();
                 String userLevel = dataSnapshot.child("userLevel").getValue().toString();
+                String imageURL = dataSnapshot.child("imageURI").getValue().toString();
+
+                if(imageURL != null){
+                    Glide.with(FriendProfileActivity.this).load(imageURL).into(mProfileImage);
+                }
 
                 mProfileName.setText(userName);
                 mUserLevel.setText(userLevel);
@@ -285,5 +298,6 @@ public class FriendProfileActivity extends AppCompatActivity {
 
 
     }
+
 
 }

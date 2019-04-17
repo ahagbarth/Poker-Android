@@ -1,6 +1,8 @@
 package com.example.poker;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -11,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -124,6 +127,12 @@ public class MainPageActivity extends AppCompatActivity {
             userName = findViewById(R.id.userName);
             userName.setText(name);
             userBalance = findViewById(R.id.userBalance);
+            Uri imageUrl = user.getPhotoUrl();
+
+            if(imageUrl != null){
+                
+                Glide.with(this).load(user.getPhotoUrl().toString()).into(buttonProfile);
+            }
 
             mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
 
